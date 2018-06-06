@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const express = require('express');
 const app = express();
 
@@ -24,6 +25,8 @@ app.get('/api/courses/:id', (request, response) => {
 });
 
 app.post('/api/courses', (request, response) => {
+    const { error } = validateCourse(request.body);
+    if ( error ) return response.status(400).send(error.message);
     const course = {
         id: courses.length + 1,
         name: request.body.name 
@@ -31,6 +34,34 @@ app.post('/api/courses', (request, response) => {
     courses.push(course);
     response.send(course);
 });
+
+app.put('/api/courses/:id', (request, response) => {
+    const course = courses.find( course => course.id == parseInt(request.params.id));
+    if(!course) return response.status(404).send(`No Course with the ID ${request.params.id}`);
+
+    const { error } = validateCourse(request.body);
+    if (error) return response.status(400).send(error.message);
+
+    course.name = request.body.name;
+    response.send(course);
+});
+
+app.delete('/api/courses/:id', (request, response) => {
+    const course = courses.find( course => course.id == parseInt(request.params.id));
+    if(!course) return response.status(404).send(`No Course with the ID ${request.params.id}`);
+
+    const index = courses.indexOf(course);
+    courses.splice(index, 1);
+    
+    response.send(course);
+});
+
+function validateCourse(course) {
+    const schema = {
+        name: Joi.string().min(3).required()
+    };
+    return Joi.validate(course, schema);
+};
 
 //PORT
 const port = process.env.PORT || 3000;
