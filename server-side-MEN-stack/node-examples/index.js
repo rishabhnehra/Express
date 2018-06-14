@@ -1,9 +1,14 @@
 let rect = require('./rectangle');
 
 function solveRect(l, b) {
-    console.log("The perimeter of rectangle is " + rect.perimeter(l,b) );
-    console.log("The area of rectangle is " + rect.area(l,b) );
-    console.log("\n");
+    console.log("STARTED");
+    rect(l, b, (err, rectangle) => {
+        if (err)
+            console.log("ERROR: ", err.message)
+        else
+            console.log("Perimeter: " + rectangle.perimeter() + "\nArea: " + rectangle.area());
+    });
+    console.log("PRINT STATEMENT AFTER rect()");
 }
 
 solveRect(1,2);
